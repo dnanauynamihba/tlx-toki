@@ -6,17 +6,17 @@ using i64 = long long;
 
 int mod = 1e9 + 7;
 int n, m;
+std::vector<std::vector<i64>> dp;
 
-i64 compute(int t, int cur, std::vector<std::vector<i64>>& dp) {
-    if(t == 0) return 1;
+i64 compute(int t, int e, std::vector<std::vector<i64>>& dp) {
+    if(t == 0) return (e == 0)? 1: 0;
     
-    if(dp[t][cur] != -1) return dp[t][cur];
+    if(dp[t][e] != -1) return dp[t][e];
     
-    if(cur == 1) dp[t][cur] = ((m - 1) * compute(t - 1, 0, dp)) % mod;
+    dp[t][e] = (e == 1)? compute(t - 1, 0, dp) % mod: 
+    (m - 1) * (compute(t - 1, 0, dp) % mod + compute(t - 1, 1, dp) % mod) % mod;
     
-    else dp[t][cur] = ((m - 1) * compute(t - 1, 0, dp)) % mod + compute(t - 1, 1, dp) % mod;
-    
-    return dp[t][cur];
+    return dp[t][e];
 }
 
 i64 binexp(int x, int y) {
@@ -31,11 +31,14 @@ void solve() {
     std::cin >> n >> m;
     
     int t = n;
-    std::vector<std::vector<i64>> dp(n + 1, std::vector<i64>(2, -1));
+    dp.assign(n + 1, std::vector<i64>(2, -1));
     
-    i64 ans = (compute(t, 0, dp) - binexp(m - 1, n) + mod) % mod;
+    i64 a1 = compute(t, 0, dp) % mod;
+    i64 a2 = compute(t, 1, dp) % mod;
     
-    std::cout << ans;
+    i64 a = (a1 + a2 - binexp(m - 1, n) + mod) % mod;
+    
+    std::cout << a;
 }
 
 signed main() {
